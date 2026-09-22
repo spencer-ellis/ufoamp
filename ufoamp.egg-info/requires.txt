@@ -1,0 +1,9 @@
+numpy>=1.24
+
+[jax]
+jax>=0.4
+jaxlib>=0.4
+
+[test]
+jax>=0.4
+jaxlib>=0.4

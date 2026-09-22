@@ -1,0 +1,2 @@
+[console_scripts]
+ufoamp-validate = ufoamp.validate:main
