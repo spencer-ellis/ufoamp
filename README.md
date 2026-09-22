@@ -242,11 +242,3 @@ processes (EW, QCD, top, Higgs, VBF, ZZHjj) at machine precision.
   the photon-vertex coupling `GC_344`; `lam` is `Gf·MH²/√2`; couplings use
   `vevhat`. SMEFTsim ships the SM loop-induced Hγγ/HZγ/Hgg effective vertices
   as tree vertices and a Wolfenstein CKM (`CKMlambda`).
-
-## Scope and next steps
-* Done: SM, HHVBF, SMEFTsim; any tree process from n-point vertices incl.
-  4-fermion; colour for quark lines (colour-flow matrix N_c^cycles); Feynman
-  and unitary gauges.
-* Not yet: external gluons / T^a, f^abc colour algebra (QCD-induced processes),
-  Majorana fermions, spin-2; vectorisation over phase-space points for fast MC
-  integration.
