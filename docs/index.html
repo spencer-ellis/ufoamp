@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ufoamp — tree-level amplitudes from a UFO model</title>
+<meta name="description" content="ufoamp evaluates tree-level helicity amplitudes and |M|² directly from a UFO model, with coupling values chosen at run time: no code generation, no recompilation.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚛️</text></svg>">
+<style>
+:root{
+  --bg:#fbfaf7; --panel:#ffffff; --ink:#14140f; --ink2:#43433c; --muted:#76766c;
+  --line:#e4e2d9; --line2:#efede6; --accent:#1c6fd0; --accent2:#0f8a6a; --warn:#b4560f;
+  --code-bg:#f5f3ec; --code-ink:#1d1d17; --shadow:0 1px 2px rgba(20,20,15,.05),0 8px 24px rgba(20,20,15,.05);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#111310; --panel:#181a17; --ink:#f0efe9; --ink2:#cbcabf; --muted:#8e8e84;
+    --line:#2a2d29; --line2:#232622; --accent:#6aa9f0; --accent2:#4cc39c; --warn:#e69248;
+    --code-bg:#13150f; --code-ink:#e6e5dc; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.25);
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;}
+code,pre,kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+
+/* ---------- nav ---------- */
+header.nav{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:18px;height:56px}
+.brand{font-weight:700;letter-spacing:-.02em;color:var(--ink);font-size:17px}
+.brand span{color:var(--muted);font-weight:500;font-size:13px;margin-left:8px}
+.nav nav{margin-left:auto;display:flex;gap:18px;flex-wrap:wrap}
+.nav nav a{color:var(--ink2);font-size:14px}
+
+/* ---------- hero ---------- */
+.hero{padding:72px 0 40px;border-bottom:1px solid var(--line)}
+h1{font-size:clamp(34px,6vw,52px);line-height:1.05;letter-spacing:-.03em;margin:0 0 14px}
+.lede{font-size:clamp(17px,2.4vw,20px);color:var(--ink2);max-width:46rem;margin:0 0 10px}
+.lede strong{color:var(--ink);font-weight:600}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 26px}
+.pill{font-size:12.5px;color:var(--ink2);border:1px solid var(--line);background:var(--panel);
+  padding:3px 10px;border-radius:999px}
+.cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.btn{display:inline-block;padding:9px 16px;border-radius:8px;font-size:14.5px;font-weight:500;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
+.btn:hover{text-decoration:none;border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(1.07)}
+
+/* ---------- sections ---------- */
+section{padding:52px 0;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:0}
+h2{font-size:clamp(22px,3.4vw,27px);letter-spacing:-.02em;margin:0 0 6px}
+h3{font-size:16px;margin:26px 0 8px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 24px;font-size:15px;max-width:44rem}
+p{max-width:44rem}
+
+/* ---------- code ---------- */
+.code{position:relative;background:var(--code-bg);border:1px solid var(--line);border-radius:10px;margin:14px 0}
+.code pre{margin:0;padding:15px 16px;overflow-x:auto;font-size:13.5px;line-height:1.6;color:var(--code-ink)}
+.code .cap{font-size:12px;color:var(--muted);padding:8px 14px 0}
+.copy{position:absolute;top:7px;right:7px;font-size:11.5px;color:var(--muted);background:var(--panel);
+  border:1px solid var(--line);border-radius:6px;padding:3px 8px;cursor:pointer;opacity:0;transition:opacity .15s}
+.code:hover .copy,.copy:focus{opacity:1}
+.cm{color:var(--muted)}
+
+/* ---------- grid ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:14px;margin-top:22px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:17px 18px;box-shadow:var(--shadow)}
+.card h4{margin:0 0 6px;font-size:15px;letter-spacing:-.01em}
+.card p{margin:0;font-size:14px;color:var(--ink2)}
+.card .k{display:block;font-size:12px;color:var(--accent2);font-weight:600;margin-bottom:8px;
+  text-transform:uppercase;letter-spacing:.07em}
+
+/* ---------- tables ---------- */
+.scroll{overflow-x:auto;margin-top:18px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line2);vertical-align:top}
+th{font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;
+  background:color-mix(in srgb,var(--panel) 70%,var(--bg))}
+tr:last-child td{border-bottom:0}
+td code{font-size:13px}
+.num{white-space:nowrap;color:var(--accent2);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+
+/* ---------- callout ---------- */
+.note{border:1px solid var(--line);border-left:3px solid var(--warn);background:var(--panel);
+  border-radius:10px;padding:16px 18px;margin-top:20px;box-shadow:var(--shadow)}
+.note h4{margin:0 0 8px;font-size:15px}
+.note p{font-size:14.5px;color:var(--ink2);margin:0 0 8px}
+.note p:last-child{margin-bottom:0}
+ul{padding-left:20px;max-width:44rem}
+li{margin:6px 0;color:var(--ink2);font-size:15px}
+footer{padding:34px 0 60px;color:var(--muted);font-size:14px}
+footer a{color:var(--ink2)}
+@media (max-width:560px){
+  .hero{padding:44px 0 32px}
+  .nav nav{gap:12px}
+  .nav nav a.hide-s{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top">ufoamp<span>v1.0.0</span></a>
+    <nav>
+      <a href="#start">Quick start</a>
+      <a href="#features">Features</a>
+      <a href="#validation">Validation</a>
+      <a class="hide-s" href="ufoamp.pdf">Manual</a>
+      <a href="https://github.com/spencer-ellis/ufoamp">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <div class="wrap">
+    <h1>Matrix elements straight<br>from a UFO model.</h1>
+    <p class="lede">ufoamp evaluates tree-level <strong>helicity amplitudes</strong> and <strong>|M|²</strong> by reading a UFO
+      model directly, with coupling values chosen at <strong>run time</strong> — no code generation, no recompilation.
+      Changing CV, C2V, C3, or switching from the SM UFO to HHVBF, is a function call.</p>
+    <div class="pills">
+      <span class="pill">Python ≥ 3.10</span>
+      <span class="pill">NumPy only</span>
+      <span class="pill">optional JAX: gradients</span>
+      <span class="pill">MIT licence</span>
+      <span class="pill">SM · HHVBF · SMEFTsim 3 · MSSM</span>
+    </div>
+    <div class="cta">
+      <a class="btn primary" href="#start">Quick start</a>
+      <a class="btn" href="https://github.com/spencer-ellis/ufoamp">View on GitHub</a>
+      <a class="btn" href="ufoamp.pdf">Manual (PDF)</a>
+    </div>
+  </div>
+</div>
+
+<section id="why">
+  <div class="wrap">
+    <h2>Why it exists</h2>
+    <p class="sub">Built for the VBF di-Higgs and Goldstone-equivalence studies, where every question is
+      “what happens to this amplitude when I change that coupling?”</p>
+    <div class="grid">
+      <div class="card">
+        <span class="k">No code generation</span>
+        <h4>Berends–Giele recursion</h4>
+        <p>Currents are built straight from the UFO vertex table, so no diagrams are enumerated and nothing is
+          written to disk or compiled. New model, new process, same code path.</p>
+      </div>
+      <div class="card">
+        <span class="k">Run-time couplings</span>
+        <h4>Reweighting is a function call</h4>
+        <p><code>set_param({"C2V": 0})</code> re-derives every internal parameter and coupling consistently.
+          Scans and per-event reweighting need one matrix element, not one build per point.</p>
+      </div>
+      <div class="card">
+        <span class="k">Cross-checked</span>
+        <h4>MadGraph standalone built in</h4>
+        <p><code>ufoamp.mg5ref</code> generates and compiles MG5’s C++ for the same process and compares on
+          identical points, symmetry factors handled — machine precision on eight SM processes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap">
+    <h2>Quick start</h2>
+    <p class="sub">Install, then point it at a UFO directory. <code>momenta</code> are NumPy 4-vectors
+      <code>[E, px, py, pz]</code> with metric (+−−−), ordered initial + final.</p>
+
+    <div class="code">
+      <button class="copy">copy</button>
+      <pre>pip install git+https://github.com/spencer-ellis/ufoamp.git
+<span class="cm"># or, from a clone:  pip install -e .        (optional extras: pip install "ufoamp[jax]")</span></pre>
+    </div>
+
+    <div class="code">
+      <div class="cap">|M|² for u d → u d H H at a chosen coupling point</div>
+      <button class="copy">copy</button>
+      <pre>from ufoamp.analysis import MatrixElement
+
+me = MatrixElement("HHVBF_UFO", "u d &gt; u d h h",
+                   couplings={"CV": 1, "C2V": 2, "C3": 1},
+                   max_orders={"QCD": 0})       <span class="cm"># MadGraph's QCD=0</span>
+
+me.m2(momenta)                                  <span class="cm"># spin/colour summed, initial averaged</span>
+me.m2_events(events, n_jobs=8)                  <span class="cm"># (N, n, 4) -&gt; (N,)</span>
+me.set_param({"C2V": 0})                        <span class="cm"># switch hypothesis, no rebuild</span>
+me.helicity_amplitudes(momenta)                 <span class="cm"># {(h1,...,hn): M}</span></pre>
+    </div>
+
+    <div class="code">
+      <div class="cap">Polarisations, LHE samples, and the validation ladder</div>
+      <button class="copy">copy</button>
+      <pre>w = MatrixElement("HHVBF_UFO", "w+ w- &gt; h h", couplings={"CV": 1, "C2V": 1, "C3": 1})
+w.m2(momenta, pol={"w+": "L"})                  <span class="cm"># external helicity selection</span>
+w.m2_polarized(momenta, ["w+", "w-"])           <span class="cm"># {'LL','LT','TL','TT'}, sums to the total</span>
+
+from ufoamp.analysis import SampleEvaluator, read_lhe
+ev = SampleEvaluator("HHVBF_UFO", couplings={"CV": 1, "C2V": 1, "C3": 1})
+ev.m2_sample(read_lhe("events.lhe.gz"))         <span class="cm"># mixed-flavour p p &gt; ... samples</span></pre>
+    </div>
+
+    <div class="code">
+      <button class="copy">copy</button>
+      <pre><span class="cm"># every line of the ladder must say PASS</span>
+export UFOAMP_MODELS=/path/to/models   <span class="cm"># SM_UFO/, HHVBF_UFO/, SMEFTsim/UFO_models/</span>
+./run_tests.sh
+
+<span class="cm"># capability report + MadGraph comparison for any model/process</span>
+python3 -m ufoamp.validate --model /path/UFO --process "u d &gt; u d h h" \
+        --orders QCD=0 --mg5 /path/mg5amcnlo --mg5-model HHVBF_UFO</pre>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <h2>What it handles</h2>
+    <p class="sub">Everything below is exercised by the test ladder in the repository.</p>
+    <div class="grid">
+      <div class="card">
+        <span class="k">Lorentz &amp; colour</span>
+        <h4>General UFO structures</h4>
+        <p>Any UFO Lorentz string (Metric, P, Gamma, ProjM/P, Identity, Gamma5, Epsilon, Sigma, atom powers) and
+          every colour structure (T, f, d, Identity, Epsilon) become one compiled einsum. Colour sextets are not
+          supported.</p>
+      </div>
+      <div class="card">
+        <span class="k">Polarisation</span>
+        <h4>External and internal</h4>
+        <p>External helicities in a chosen frame (<code>pol_frame</code>: lab, partonic CM, or any leg set), plus an
+          exact propagator decomposition −g<sup>μν</sup> + k<sup>μ</sup>k<sup>ν</sup>/M² = T + L + S for the
+          t-channel fusing bosons.</p>
+      </div>
+      <div class="card">
+        <span class="k">Gauge</span>
+        <h4>Feynman or unitary</h4>
+        <p>Auto-detected from whether the UFO ships Goldstones, and forceable. Feynman ≡ unitary is verified
+          numerically on W<sub>L</sub>W<sub>L</sub> → HH and VBF-HH.</p>
+      </div>
+      <div class="card">
+        <span class="k">SMEFT</span>
+        <h4>SMEFTsim 3, all nine variants</h4>
+        <p>Wilson coefficients are ordinary overrides. 5- and 6-leg vertices, four-fermion operators with
+          Fierz-crossed chains, and the G<sub>F</sub> input-scheme shifts are reproduced.</p>
+      </div>
+      <div class="card">
+        <span class="k">Fermions</span>
+        <h4>Majorana and clashing arrows</h4>
+        <p>Charge conjugation in place for fermion-flow-violating vertices, validated against MG5 on MSSM_SLHA2 at
+          1e-14–1e-16, including negative SLHA mass eigenvalues.</p>
+      </div>
+      <div class="card">
+        <span class="k">Differentiable</span>
+        <h4>JAX backend</h4>
+        <p><code>JaxMatrixElement</code> traces UFO parameters → couplings → |M|² once and compiles it:
+          <code>grad_params</code>, <code>grad_momenta</code> and <code>hessian_params</code>, matching NumPy to
+          machine precision.</p>
+      </div>
+    </div>
+
+    <h3>Speed</h3>
+    <p>Events and helicity configurations share one pass of the recursion, with a batch axis on every wavefunction,
+      current and propagator, and exactly-vanishing helicity configurations pruned. Per core: about
+      <span class="num">0.1 ms</span> for 2 → 2, <span class="num">1.6 ms</span> per VBF-HH event, and
+      <span class="num">20 ms</span> for <code>u d &gt; u d z z h</code>. Colour cost scales as 8<sup>#gluons</sup>,
+      so up to four gluons is comfortable and gg → ggg is not.</p>
+  </div>
+</section>
+
+<section id="validation">
+  <div class="wrap">
+    <h2>Validation</h2>
+    <p class="sub">The ladder runs from textbook cross sections to two-UFO, two-gauge comparisons. All exact unless
+      stated.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Test</th><th>What it pins down</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>e⁺e⁻ → μ⁺μ⁻, photon</td><td>engine and UFO plumbing vs e⁴(1+cos²θ)</td><td class="num">1e-9</td></tr>
+          <tr><td>e⁺e⁻ → μ⁺μ⁻, γ + Z</td><td>chiral slots, Z width, interference, A<sub>FB</sub> sign change</td><td class="num">1e-7</td></tr>
+          <tr><td>σ(e⁺e⁻ → μ⁺μ⁻)</td><td>absolute normalisation vs 4πα²/3s</td><td class="num">1.00000000</td></tr>
+          <tr><td>e⁺e⁻ → W⁺W⁻</td><td>longitudinal gauge cancellation (VVV, t-channel ν, γ/Z)</td><td class="num">|M<sub>LL</sub>|² → const</td></tr>
+          <tr><td>Bhabha, e⁺e⁻ → uū</td><td>fermion-exchange sign; colour sum N<sub>c</sub>Q<sub>u</sub>²</td><td class="num">1e-8 / exact</td></tr>
+          <tr><td><strong>u d → u d H H</strong></td><td><strong>HHVBF(1,1,1) ≡ SM UFO: 6-point, colour flows, CKM</strong></td><td class="num">1.000000000</td></tr>
+          <tr><td>W<sub>L</sub>W<sub>L</sub> → HH vs G⁺G⁻ → HH</td><td>Goldstone equivalence theorem</td><td class="num">1.0004 at 8 TeV</td></tr>
+          <tr><td><strong>SMEFTsim(c = 0) vs SM_UFO, VBF-HH</strong></td><td><strong>two UFOs, two gauges, 6-point</strong></td><td class="num">1e-9</td></tr>
+          <tr><td>SMEFTsim e⁺e⁻ → μ⁺μ⁻</td><td>SM limit, contact normalisation, Fierz identity cll ↔ cll1</td><td class="num">exact</td></tr>
+          <tr><td>QCD 2 → 2 (seven channels)</td><td>analytic massless results and MadGraph</td><td class="num">~1e-15</td></tr>
+          <tr><td>MSSM_SLHA2 (nine processes)</td><td>Majorana flows, gluino pairs, 6-point neutralinos</td><td class="num">1e-14–1e-16</td></tr>
+          <tr><td>MG5 standalone, eight SM processes</td><td>EW, QCD, top, Higgs, VBF, ZZHjj</td><td class="num">machine precision</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <h4>A physics result worth knowing before you scan CV</h4>
+      <p>The HHVBF UFO scales only the physical VVH (CV), VVHH (C2V) and HHH (C3) vertices; every Goldstone–Higgs
+        vertex keeps its SM value. So in Feynman gauge the O(s) growth of W<sub>L</sub>W<sub>L</sub> → HH goes
+        like (C2V − 1), independent of CV, while in unitary gauge — MadGraph’s default — it goes like (C2V − CV²).</p>
+      <p>The two agree only at CV = 1. Away from CV = 1 the model is gauge dependent, so MadGraph and RECOLA
+        disagree there. C2V and C3 scans at CV = 1 are safe.</p>
+    </div>
+  </div>
+</section>
+
+<section id="inside">
+  <div class="wrap">
+    <h2>What is inside</h2>
+    <p class="sub">About 3 700 lines of Python, no build step, no generated code.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Module</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr><td><code>ufo_model.py</code></td><td>self-contained UFO loader, modern and legacy (never imports the UFO’s own library)</td></tr>
+          <tr><td><code>couplings.py</code></td><td>parameters → couplings, with run-time overrides and injected derived values</td></tr>
+          <tr><td><code>dirac.py</code>, <code>wavefunctions.py</code>, <code>propagators.py</code></td><td>frozen conventions: metric, Dirac basis, helicity spinors, polarisation vectors, propagators</td></tr>
+          <tr><td><code>vertex_eval.py</code></td><td>general einsum evaluator: any UFO Lorentz string → off-shell current</td></tr>
+          <tr><td><code>recursion.py</code></td><td>Berends–Giele recursion driven by the vertex table; fermion-line connectivity gives exchange signs and colour flow</td></tr>
+          <tr><td><code>process.py</code>, <code>analysis.py</code></td><td>user interface: process strings, |M|², polarisation selection, event arrays, LHE reader</td></tr>
+          <tr><td><code>jaxme.py</code></td><td>compiled, differentiable matrix elements</td></tr>
+          <tr><td><code>mg5ref.py</code></td><td>MadGraph standalone reference: generate, compile, compare</td></tr>
+          <tr><td><code>phasespace.py</code>, <code>validate.py</code></td><td>RAMBO; capability report and the <code>ufoamp-validate</code> command</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Not yet supported</h3>
+    <p>Spin-2 particles, colour sextets, and custom propagators or form factors.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>ufoamp v1.0.0 · MIT licence · <a href="https://github.com/spencer-ellis/ufoamp">github.com/spencer-ellis/ufoamp</a>
+      · <a href="ufoamp.pdf">manual</a></p>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll(".code").forEach(function (block) {
+  var btn = block.querySelector(".copy");
+  if (!btn) return;
+  btn.addEventListener("click", function () {
+    var text = block.querySelector("pre").innerText;
+    navigator.clipboard.writeText(text).then(function () {
+      btn.textContent = "copied";
+      setTimeout(function () { btn.textContent = "copy"; }, 1400);
+    }, function () { btn.textContent = "ctrl+c"; });
+  });
+});
+</script>
+</body>
+</html>
