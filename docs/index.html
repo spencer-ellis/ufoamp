@@ -260,8 +260,12 @@ footer a:hover{color:var(--peri)}
     <div class="code">
       <div class="bar"><i></i><i></i><i></i><span class="cap">Install</span></div>
       <button class="copy">copy</button>
-      <pre>pip install git+https://github.com/spencer-ellis/ufoamp.git
-<span class="cm"># or, from a clone:  pip install -e .        (optional extras: pip install "ufoamp[jax]")</span></pre>
+      <pre>pip install ufoamp
+pip install "ufoamp[jax]"        <span class="cm"># optional: JAX backend for gradients</span>
+
+<span class="cm"># latest from GitHub, or an editable install from a clone</span>
+pip install git+https://github.com/spencer-ellis/ufoamp.git
+pip install -e .</pre>
     </div>
 
     <div class="code">
@@ -438,7 +442,7 @@ python3 -m ufoamp.validate --model /path/MyModel_UFO --process "u d &gt; u d h h
   <div class="wrap">
     <a class="brand" href="#top"><span class="logo"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M11 24.5 L8.5 29 H23.5 L21 24.5Z" fill="#fff" opacity=".22"/><path d="M9.2 17.5a6.8 6.8 0 0 1 13.6 0Z" fill="#fff" fill-opacity=".28" stroke="#fff" stroke-width="1.2"/><path d="M14.3 10.6 13 8.4M17.7 10.6 19 8.4" stroke="#8ff0c4" stroke-width="1" stroke-linecap="round"/><circle cx="13" cy="8.4" r=".9" fill="#8ff0c4"/><circle cx="19" cy="8.4" r=".9" fill="#8ff0c4"/><path d="M16 10.2c2.4 0 3.9 1.7 3.9 3.6 0 2.3-2 3.9-3.9 3.9s-3.9-1.6-3.9-3.9c0-1.9 1.5-3.6 3.9-3.6Z" fill="#8ff0c4"/><ellipse cx="14.5" cy="13.9" rx="1.05" ry="1.6" transform="rotate(-25 14.5 13.9)" fill="#1d2547"/><ellipse cx="17.5" cy="13.9" rx="1.05" ry="1.6" transform="rotate(25 17.5 13.9)" fill="#1d2547"/><ellipse cx="16" cy="19.6" rx="13" ry="4.6" fill="#fff"/><ellipse cx="16" cy="18.4" rx="9" ry="1.6" fill="#dfe6ff"/><circle cx="8.6" cy="20.6" r="1.05" fill="#8b7cf6"/><circle cx="12.3" cy="21.6" r="1.05" fill="#e57fb2"/><circle cx="16" cy="21.9" r="1.05" fill="#5b8def"/><circle cx="19.7" cy="21.6" r="1.05" fill="#e57fb2"/><circle cx="23.4" cy="20.6" r="1.05" fill="#8b7cf6"/></svg></span>ufoamp</a>
     <p>ufoamp v1.0.0 · MIT licence · <a href="https://github.com/spencer-ellis/ufoamp">github.com/spencer-ellis/ufoamp</a>
-      · <a href="ufoamp.pdf">manual</a> · <a href="mailto:spencer_ellis@brown.edu">contact</a></p>
+      · <a href="https://pypi.org/project/ufoamp/">PyPI</a> · <a href="ufoamp.pdf">manual</a> · <a href="mailto:spencer_ellis@brown.edu">contact</a></p>
   </div>
 </footer>
 
