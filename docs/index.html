@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ufoamp — tree-level amplitudes from a UFO model</title>
 <meta name="description" content="ufoamp evaluates tree-level helicity amplitudes and |M|² directly from a UFO model, with coupling values chosen at run time: no code generation, no recompilation.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%235b8def'/><stop offset='1' stop-color='%238b7cf6'/></linearGradient></defs><rect width='32' height='32' rx='9' fill='url(%23g)'/><g fill='none' stroke='white' stroke-width='2'><ellipse cx='16' cy='16' rx='11' ry='4.5'/><ellipse cx='16' cy='16' rx='11' ry='4.5' transform='rotate(60 16 16)'/><ellipse cx='16' cy='16' rx='11' ry='4.5' transform='rotate(120 16 16)'/></g></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%235b8def'/><stop offset='.6' stop-color='%238b7cf6'/><stop offset='1' stop-color='%23e57fb2'/></linearGradient></defs><rect width='32' height='32' rx='9' fill='url(%23g)'/><path d='M11 24.5 L8.5 29 H23.5 L21 24.5Z' fill='%23fff' opacity='.22'/><path d='M9.2 17.5a6.8 6.8 0 0 1 13.6 0Z' fill='%23fff' fill-opacity='.28' stroke='%23fff' stroke-width='1.2'/><path d='M14.3 10.6 13 8.4M17.7 10.6 19 8.4' stroke='%238ff0c4' stroke-width='1' stroke-linecap='round'/><circle cx='13' cy='8.4' r='.9' fill='%238ff0c4'/><circle cx='19' cy='8.4' r='.9' fill='%238ff0c4'/><path d='M16 10.2c2.4 0 3.9 1.7 3.9 3.6 0 2.3-2 3.9-3.9 3.9s-3.9-1.6-3.9-3.9c0-1.9 1.5-3.6 3.9-3.6Z' fill='%238ff0c4'/><ellipse cx='14.5' cy='13.9' rx='1.05' ry='1.6' transform='rotate(-25 14.5 13.9)' fill='%231d2547'/><ellipse cx='17.5' cy='13.9' rx='1.05' ry='1.6' transform='rotate(25 17.5 13.9)' fill='%231d2547'/><ellipse cx='16' cy='19.6' rx='13' ry='4.6' fill='%23fff'/><ellipse cx='16' cy='18.4' rx='9' ry='1.6' fill='%23dfe6ff'/><circle cx='8.6' cy='20.6' r='1.05' fill='%238b7cf6'/><circle cx='12.3' cy='21.6' r='1.05' fill='%23e57fb2'/><circle cx='16' cy='21.9' r='1.05' fill='%235b8def'/><circle cx='19.7' cy='21.6' r='1.05' fill='%23e57fb2'/><circle cx='23.4' cy='20.6' r='1.05' fill='%238b7cf6'/></svg>">
 <script>document.documentElement.classList.add("js")</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,7 +60,7 @@ header.nav{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--b
 .brand:hover{color:var(--ink)}
 .logo{width:30px;height:30px;border-radius:10px;background:var(--grad);display:grid;place-items:center;
   box-shadow:0 6px 16px -4px rgba(91,141,239,.55)}
-.logo svg{width:18px;height:18px}
+.logo svg{width:100%;height:100%;display:block}
 .brand .ver{color:var(--peri);background:var(--peri-soft);font-weight:700;font-size:12px;padding:2px 9px;border-radius:999px}
 .nav nav{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
 .nav nav a{color:var(--ink2);font-size:15px;font-weight:600;padding:6px 12px;border-radius:999px;transition:background .15s,color .15s}
@@ -160,18 +160,23 @@ td strong{font-weight:800}
 td.num::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--mint);margin-right:8px;vertical-align:middle;opacity:.8}
 p .num{background:var(--mint-soft);padding:1px 8px;border-radius:7px}
 
-/* ---------- callout ---------- */
-.note{border:1px solid color-mix(in srgb,var(--peach) 35%,var(--line));background:linear-gradient(135deg,var(--peach-soft),var(--pink-soft));
   border-radius:22px;padding:24px 26px;margin-top:28px;box-shadow:var(--shadow)}
-.note h4{margin:0 0 10px;font-size:18px;font-weight:800;display:flex;align-items:center;gap:10px}
-.note h4::before{content:"!";display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--peach);color:#fff;font-size:15px;flex:none}
-.note p{font-size:15.5px;color:var(--ink2);margin:0 0 10px;max-width:none}
-.note p:last-child{margin-bottom:0}
-.note code{background:rgba(255,255,255,.5)}
 ul{padding-left:20px;max-width:44rem}
 li{margin:6px 0;color:var(--ink2);font-size:15px}
 .unsupported{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
 .unsupported span{font-size:14.5px;font-weight:700;color:var(--ink2);border:1.5px dashed var(--line);padding:6px 14px;border-radius:999px}
+
+/* ---------- contact ---------- */
+.contact{display:flex;align-items:center;gap:26px;flex-wrap:wrap;margin-top:10px;padding:30px 32px;border-radius:26px;
+  background:linear-gradient(135deg,var(--blue-soft),var(--peri-soft) 55%,var(--pink-soft));border:1px solid var(--line);box-shadow:var(--shadow)}
+.avatar{width:76px;height:76px;border-radius:24px;background:var(--grad);color:#fff;display:grid;place-items:center;
+  font-size:28px;font-weight:900;letter-spacing:-.02em;flex:none;box-shadow:0 10px 26px -8px rgba(109,125,240,.7)}
+.who{flex:1 1 260px}
+.who h4{margin:0;font-size:22px;font-weight:900;letter-spacing:-.02em}
+.who .aff{color:var(--ink2);font-weight:600;font-size:15.5px}
+.who p{margin:8px 0 0;color:var(--ink2);font-size:15.5px}
+.mail{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:14.5px;color:var(--ink);font-weight:500}
+.contact .cta{flex:none}
 
 footer{padding:48px 0 64px;color:var(--muted);font-size:15px;border-top:1px solid var(--line)}
 footer .wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
@@ -203,12 +208,13 @@ footer a:hover{color:var(--peri)}
 
 <header class="nav">
   <div class="wrap">
-    <a class="brand" href="#top"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></span>ufoamp<span class="ver">v1.0.0</span></a>
+    <a class="brand" href="#top"><span class="logo"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M11 24.5 L8.5 29 H23.5 L21 24.5Z" fill="#fff" opacity=".22"/><path d="M9.2 17.5a6.8 6.8 0 0 1 13.6 0Z" fill="#fff" fill-opacity=".28" stroke="#fff" stroke-width="1.2"/><path d="M14.3 10.6 13 8.4M17.7 10.6 19 8.4" stroke="#8ff0c4" stroke-width="1" stroke-linecap="round"/><circle cx="13" cy="8.4" r=".9" fill="#8ff0c4"/><circle cx="19" cy="8.4" r=".9" fill="#8ff0c4"/><path d="M16 10.2c2.4 0 3.9 1.7 3.9 3.6 0 2.3-2 3.9-3.9 3.9s-3.9-1.6-3.9-3.9c0-1.9 1.5-3.6 3.9-3.6Z" fill="#8ff0c4"/><ellipse cx="14.5" cy="13.9" rx="1.05" ry="1.6" transform="rotate(-25 14.5 13.9)" fill="#1d2547"/><ellipse cx="17.5" cy="13.9" rx="1.05" ry="1.6" transform="rotate(25 17.5 13.9)" fill="#1d2547"/><ellipse cx="16" cy="19.6" rx="13" ry="4.6" fill="#fff"/><ellipse cx="16" cy="18.4" rx="9" ry="1.6" fill="#dfe6ff"/><circle cx="8.6" cy="20.6" r="1.05" fill="#8b7cf6"/><circle cx="12.3" cy="21.6" r="1.05" fill="#e57fb2"/><circle cx="16" cy="21.9" r="1.05" fill="#5b8def"/><circle cx="19.7" cy="21.6" r="1.05" fill="#e57fb2"/><circle cx="23.4" cy="20.6" r="1.05" fill="#8b7cf6"/></svg></span>ufoamp<span class="ver">v1.0.0</span></a>
     <nav>
       <a href="#start">Quick start</a>
       <a class="hide-s" href="#features">Features</a>
       <a class="hide-s" href="#validation">Validation</a>
       <a class="hide-s" href="ufoamp.pdf">Manual</a>
+      <a class="hide-s" href="#contact">Contact</a>
       <a href="https://github.com/spencer-ellis/ufoamp">GitHub</a>
     </nav>
   </div>
@@ -217,17 +223,18 @@ footer a:hover{color:var(--peri)}
 <div class="hero" id="top">
   <div class="blobs" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
   <div class="wrap">
-    <a class="eyebrow" href="https://github.com/spencer-ellis/ufoamp"><b>v1.0.0</b> Tree-level amplitudes, no code generation</a>
+    <a class="eyebrow" href="https://github.com/spencer-ellis/ufoamp"><b>v1.0.0</b> Tree-level amplitudes for any UFO model</a>
     <h1>Matrix elements straight<br>from a <span class="g">UFO model.</span></h1>
-    <p class="lede">ufoamp evaluates tree-level <strong>helicity amplitudes</strong> and <strong>|M|²</strong> by reading a UFO
-      model directly, with coupling values chosen at <strong>run time</strong> — no code generation, no recompilation.
-      Changing CV, C2V, C3, or switching from the SM UFO to HHVBF, is a function call.</p>
+    <p class="lede">ufoamp is a general-purpose generator of tree-level <strong>helicity amplitudes</strong> and
+      <strong>|M|²</strong>. Point it at any UFO model and any process: the model is read directly, and its parameters
+      are chosen at <strong>run time</strong> — no code generation, no recompilation. Changing a mass, a coupling or a
+      Wilson coefficient, or switching to a different model, is a function call.</p>
     <div class="pills">
       <span class="pill">Python ≥ 3.10</span>
       <span class="pill">NumPy only</span>
       <span class="pill">optional JAX: gradients</span>
       <span class="pill">MIT licence</span>
-      <span class="pill">SM · HHVBF · SMEFTsim 3 · MSSM</span>
+      <span class="pill">any UFO model</span>
     </div>
     <div class="cta">
       <a class="btn primary" href="#start">Quick start →</a>
@@ -237,40 +244,11 @@ footer a:hover{color:var(--peri)}
     <div class="stats">
       <div class="stat"><b>0.1 ms</b><span>per 2 → 2 point, one core</span></div>
       <div class="stat"><b>~1e-15</b><span>agreement with MadGraph</span></div>
-      <div class="stat"><b>9 / 9</b><span>SMEFTsim 3 variants</span></div>
+      <div class="stat"><b>0</b><span>files generated or compiled</span></div>
       <div class="stat"><b>~3 700</b><span>lines of Python, no build</span></div>
     </div>
   </div>
 </div>
-
-<section id="why">
-  <div class="wrap reveal">
-    <span class="tag">Motivation</span>
-    <h2>Why it exists</h2>
-    <p class="sub">Built for the VBF di-Higgs and Goldstone-equivalence studies, where every question is
-      “what happens to this amplitude when I change that coupling?”</p>
-    <div class="grid">
-      <div class="card">
-        <span class="k">No code generation</span>
-        <h4>Berends–Giele recursion</h4>
-        <p>Currents are built straight from the UFO vertex table, so no diagrams are enumerated and nothing is
-          written to disk or compiled. New model, new process, same code path.</p>
-      </div>
-      <div class="card">
-        <span class="k">Run-time couplings</span>
-        <h4>Reweighting is a function call</h4>
-        <p><code>set_param({"C2V": 0})</code> re-derives every internal parameter and coupling consistently.
-          Scans and per-event reweighting need one matrix element, not one build per point.</p>
-      </div>
-      <div class="card">
-        <span class="k">Cross-checked</span>
-        <h4>MadGraph standalone built in</h4>
-        <p><code>ufoamp.mg5ref</code> generates and compiles MG5’s C++ for the same process and compares on
-          identical points, symmetry factors handled — machine precision on eight SM processes.</p>
-      </div>
-    </div>
-  </div>
-</section>
 
 <section id="start" class="alt">
   <div class="wrap reveal">
@@ -287,29 +265,29 @@ footer a:hover{color:var(--peri)}
     </div>
 
     <div class="code">
-      <div class="bar"><i></i><i></i><i></i><span class="cap">|M|² for u d → u d H H at a chosen coupling point</span></div>
+      <div class="bar"><i></i><i></i><i></i><span class="cap">|M|² for any process, at any parameter point</span></div>
       <button class="copy">copy</button>
       <pre>from ufoamp.analysis import MatrixElement
 
-me = MatrixElement("HHVBF_UFO", "u d &gt; u d h h",
-                   couplings={"CV": 1, "C2V": 2, "C3": 1},
+me = MatrixElement("SM_UFO", "u d &gt; u d h h",   <span class="cm"># any UFO directory, any process</span>
+                   couplings={"MH": 125.0},     <span class="cm"># any external UFO parameter</span>
                    max_orders={"QCD": 0})       <span class="cm"># MadGraph's QCD=0</span>
 
 me.m2(momenta)                                  <span class="cm"># spin/colour summed, initial averaged</span>
 me.m2_events(events, n_jobs=8)                  <span class="cm"># (N, n, 4) -&gt; (N,)</span>
-me.set_param({"C2V": 0})                        <span class="cm"># switch hypothesis, no rebuild</span>
+me.set_param({"MH": 300.0})                     <span class="cm"># new parameter point, no rebuild</span>
 me.helicity_amplitudes(momenta)                 <span class="cm"># {(h1,...,hn): M}</span></pre>
     </div>
 
     <div class="code">
       <div class="bar"><i></i><i></i><i></i><span class="cap">Polarisations, LHE samples, and the validation ladder</span></div>
       <button class="copy">copy</button>
-      <pre>w = MatrixElement("HHVBF_UFO", "w+ w- &gt; h h", couplings={"CV": 1, "C2V": 1, "C3": 1})
+      <pre>w = MatrixElement("SM_UFO", "w+ w- &gt; h h")
 w.m2(momenta, pol={"w+": "L"})                  <span class="cm"># external helicity selection</span>
 w.m2_polarized(momenta, ["w+", "w-"])           <span class="cm"># {'LL','LT','TL','TT'}, sums to the total</span>
 
 from ufoamp.analysis import SampleEvaluator, read_lhe
-ev = SampleEvaluator("HHVBF_UFO", couplings={"CV": 1, "C2V": 1, "C3": 1})
+ev = SampleEvaluator("SM_UFO")
 ev.m2_sample(read_lhe("events.lhe.gz"))         <span class="cm"># mixed-flavour p p &gt; ... samples</span></pre>
     </div>
 
@@ -321,8 +299,8 @@ export UFOAMP_MODELS=/path/to/models   <span class="cm"># SM_UFO/, HHVBF_UFO/, S
 ./run_tests.sh
 
 <span class="cm"># capability report + MadGraph comparison for any model/process</span>
-python3 -m ufoamp.validate --model /path/UFO --process "u d &gt; u d h h" \
-        --orders QCD=0 --mg5 /path/mg5amcnlo --mg5-model HHVBF_UFO</pre>
+python3 -m ufoamp.validate --model /path/MyModel_UFO --process "u d &gt; u d h h" \
+        --orders QCD=0 --mg5 /path/mg5amcnlo --mg5-model MyModel_UFO</pre>
     </div>
   </div>
 </section>
@@ -351,19 +329,19 @@ python3 -m ufoamp.validate --model /path/UFO --process "u d &gt; u d h h" \
         <span class="k">Gauge</span>
         <h4>Feynman or unitary</h4>
         <p>Auto-detected from whether the UFO ships Goldstones, and forceable. Feynman ≡ unitary is verified
-          numerically on W<sub>L</sub>W<sub>L</sub> → HH and VBF-HH.</p>
+          numerically.</p>
       </div>
       <div class="card">
-        <span class="k">SMEFT</span>
-        <h4>SMEFTsim 3, all nine variants</h4>
-        <p>Wilson coefficients are ordinary overrides. 5- and 6-leg vertices, four-fermion operators with
-          Fierz-crossed chains, and the G<sub>F</sub> input-scheme shifts are reproduced.</p>
+        <span class="k">EFT</span>
+        <h4>Effective field theories</h4>
+        <p>Wilson coefficients are ordinary parameter overrides. 5- and 6-leg vertices, four-fermion contact operators
+          with Fierz-crossed chains, and input-scheme shifts are all handled.</p>
       </div>
       <div class="card">
         <span class="k">Fermions</span>
         <h4>Majorana and clashing arrows</h4>
-        <p>Charge conjugation in place for fermion-flow-violating vertices, validated against MG5 on MSSM_SLHA2 at
-          1e-14–1e-16, including negative SLHA mass eigenvalues.</p>
+        <p>Charge conjugation in place for fermion-flow-violating vertices, validated against MadGraph at 1e-14–1e-16,
+          including negative SLHA mass eigenvalues.</p>
       </div>
       <div class="card">
         <span class="k">Differentiable</span>
@@ -377,7 +355,7 @@ python3 -m ufoamp.validate --model /path/UFO --process "u d &gt; u d h h" \
     <h3>Speed</h3>
     <p>Events and helicity configurations share one pass of the recursion, with a batch axis on every wavefunction,
       current and propagator, and exactly-vanishing helicity configurations pruned. Per core: about
-      <span class="num">0.1 ms</span> for 2 → 2, <span class="num">1.6 ms</span> per VBF-HH event, and
+      <span class="num">0.1 ms</span> for 2 → 2, <span class="num">1.6 ms</span> for a 2 → 4 event, and
       <span class="num">20 ms</span> for <code>u d &gt; u d z z h</code>. Colour cost scales as 8<sup>#gluons</sup>,
       so up to four gluons is comfortable and gg → ggg is not.</p>
   </div>
@@ -409,14 +387,6 @@ python3 -m ufoamp.validate --model /path/UFO --process "u d &gt; u d h h" \
       </table>
     </div>
 
-    <div class="note">
-      <h4>A physics result worth knowing before you scan CV</h4>
-      <p>The HHVBF UFO scales only the physical VVH (CV), VVHH (C2V) and HHH (C3) vertices; every Goldstone–Higgs
-        vertex keeps its SM value. So in Feynman gauge the O(s) growth of W<sub>L</sub>W<sub>L</sub> → HH goes
-        like (C2V − 1), independent of CV, while in unitary gauge — MadGraph’s default — it goes like (C2V − CV²).</p>
-      <p>The two agree only at CV = 1. Away from CV = 1 the model is gauge dependent, so MadGraph and RECOLA
-        disagree there. C2V and C3 scans at CV = 1 are safe.</p>
-    </div>
   </div>
 </section>
 
@@ -446,11 +416,31 @@ python3 -m ufoamp.validate --model /path/UFO --process "u d &gt; u d h h" \
   </div>
 </section>
 
+<section id="contact" class="alt">
+  <div class="wrap reveal">
+    <span class="tag">Get in touch</span>
+    <h2>Contact the author</h2>
+    <p class="sub">Questions, bug reports, a model that doesn’t load, or an idea for a feature — all welcome.</p>
+    <div class="contact">
+      <div class="avatar" aria-hidden="true">SE</div>
+      <div class="who">
+        <h4>Spencer Ellis</h4>
+        <div class="aff">Brown University</div>
+        <p><a class="mail" href="mailto:spencer_ellis@brown.edu">spencer_ellis@brown.edu</a></p>
+      </div>
+      <div class="cta">
+        <a class="btn primary" href="mailto:spencer_ellis@brown.edu?subject=ufoamp">Send an email</a>
+        <a class="btn" href="https://github.com/spencer-ellis/ufoamp/issues">Open an issue</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
-    <a class="brand" href="#top"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></span>ufoamp</a>
+    <a class="brand" href="#top"><span class="logo"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M11 24.5 L8.5 29 H23.5 L21 24.5Z" fill="#fff" opacity=".22"/><path d="M9.2 17.5a6.8 6.8 0 0 1 13.6 0Z" fill="#fff" fill-opacity=".28" stroke="#fff" stroke-width="1.2"/><path d="M14.3 10.6 13 8.4M17.7 10.6 19 8.4" stroke="#8ff0c4" stroke-width="1" stroke-linecap="round"/><circle cx="13" cy="8.4" r=".9" fill="#8ff0c4"/><circle cx="19" cy="8.4" r=".9" fill="#8ff0c4"/><path d="M16 10.2c2.4 0 3.9 1.7 3.9 3.6 0 2.3-2 3.9-3.9 3.9s-3.9-1.6-3.9-3.9c0-1.9 1.5-3.6 3.9-3.6Z" fill="#8ff0c4"/><ellipse cx="14.5" cy="13.9" rx="1.05" ry="1.6" transform="rotate(-25 14.5 13.9)" fill="#1d2547"/><ellipse cx="17.5" cy="13.9" rx="1.05" ry="1.6" transform="rotate(25 17.5 13.9)" fill="#1d2547"/><ellipse cx="16" cy="19.6" rx="13" ry="4.6" fill="#fff"/><ellipse cx="16" cy="18.4" rx="9" ry="1.6" fill="#dfe6ff"/><circle cx="8.6" cy="20.6" r="1.05" fill="#8b7cf6"/><circle cx="12.3" cy="21.6" r="1.05" fill="#e57fb2"/><circle cx="16" cy="21.9" r="1.05" fill="#5b8def"/><circle cx="19.7" cy="21.6" r="1.05" fill="#e57fb2"/><circle cx="23.4" cy="20.6" r="1.05" fill="#8b7cf6"/></svg></span>ufoamp</a>
     <p>ufoamp v1.0.0 · MIT licence · <a href="https://github.com/spencer-ellis/ufoamp">github.com/spencer-ellis/ufoamp</a>
-      · <a href="ufoamp.pdf">manual</a></p>
+      · <a href="ufoamp.pdf">manual</a> · <a href="mailto:spencer_ellis@brown.edu">contact</a></p>
   </div>
 </footer>
 
