@@ -15,8 +15,8 @@ def use(name: str):
     else:
         raise ValueError(name)
     _current = name
-    from . import vertex_eval, recursion, process, wf_batched
-    for mod in (vertex_eval, recursion, process, wf_batched):
+    from . import vertex_eval, recursion, process, wf_batched, analysis
+    for mod in (vertex_eval, recursion, process, wf_batched, analysis):
         mod.xp = xp
 
 def current() -> str:

@@ -5,102 +5,197 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ufoamp — tree-level amplitudes from a UFO model</title>
 <meta name="description" content="ufoamp evaluates tree-level helicity amplitudes and |M|² directly from a UFO model, with coupling values chosen at run time: no code generation, no recompilation.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚛️</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%235b8def'/><stop offset='1' stop-color='%238b7cf6'/></linearGradient></defs><rect width='32' height='32' rx='9' fill='url(%23g)'/><g fill='none' stroke='white' stroke-width='2'><ellipse cx='16' cy='16' rx='11' ry='4.5'/><ellipse cx='16' cy='16' rx='11' ry='4.5' transform='rotate(60 16 16)'/><ellipse cx='16' cy='16' rx='11' ry='4.5' transform='rotate(120 16 16)'/></g></svg>">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#fbfaf7; --panel:#ffffff; --ink:#14140f; --ink2:#43433c; --muted:#76766c;
-  --line:#e4e2d9; --line2:#efede6; --accent:#1c6fd0; --accent2:#0f8a6a; --warn:#b4560f;
-  --code-bg:#f5f3ec; --code-ink:#1d1d17; --shadow:0 1px 2px rgba(20,20,15,.05),0 8px 24px rgba(20,20,15,.05);
+  --bg:#f5f8ff; --bg2:#eef3ff; --panel:rgba(255,255,255,.78); --panel-solid:#ffffff;
+  --ink:#1d2547; --ink2:#4a5378; --muted:#7d86a8;
+  --line:#dfe6f7; --line2:#ebf0fb;
+  --blue:#5b8def; --blue-soft:#dce8ff; --peri:#8b7cf6; --peri-soft:#ece8ff;
+  --mint:#3fb59a; --mint-soft:#d9f5ec; --peach:#f39a7b; --peach-soft:#ffe9df;
+  --pink:#e57fb2; --pink-soft:#fde6f1; --sky:#4fb3e3; --sky-soft:#dcf2fc;
+  --accent:var(--blue); --grad:linear-gradient(120deg,#5b8def 0%,#8b7cf6 55%,#e57fb2 100%);
+  --code-bg:#1f2546; --code-ink:#e3e8ff; --code-cm:#8a93c4; --code-str:#9fe3c8; --code-kw:#c4b5fd; --code-num:#ffc6a8; --code-fn:#9cc8ff;
+  --shadow:0 1px 2px rgba(40,60,140,.05),0 10px 30px -8px rgba(60,80,170,.14);
+  --shadow-lg:0 2px 4px rgba(40,60,140,.05),0 22px 50px -12px rgba(60,80,170,.25);
+  --blob1:#c9dbff; --blob2:#e3d9ff; --blob3:#d2f3ea; --blob4:#ffe0d4;
 }
 @media (prefers-color-scheme:dark){
   :root{
-    --bg:#111310; --panel:#181a17; --ink:#f0efe9; --ink2:#cbcabf; --muted:#8e8e84;
-    --line:#2a2d29; --line2:#232622; --accent:#6aa9f0; --accent2:#4cc39c; --warn:#e69248;
-    --code-bg:#13150f; --code-ink:#e6e5dc; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.25);
+    --bg:#0e1226; --bg2:#121733; --panel:rgba(26,32,64,.72); --panel-solid:#1a2040;
+    --ink:#eef1ff; --ink2:#bfc6e8; --muted:#8a92ba;
+    --line:#2a3260; --line2:#232a52;
+    --blue:#8cb0ff; --blue-soft:#24305e; --peri:#b3a8ff; --peri-soft:#2d2a5c;
+    --mint:#7ad9bf; --mint-soft:#1d3a44; --peach:#ffb59a; --peach-soft:#3d2c34;
+    --pink:#f5a3cb; --pink-soft:#3c2747; --sky:#87d1f2; --sky-soft:#1d3550;
+    --grad:linear-gradient(120deg,#8cb0ff 0%,#b3a8ff 55%,#f5a3cb 100%);
+    --code-bg:#151a36; --code-ink:#e3e8ff;
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 10px 30px -10px rgba(0,0,0,.5);
+    --shadow-lg:0 2px 4px rgba(0,0,0,.35),0 22px 50px -12px rgba(0,0,0,.6);
+    --blob1:#22336e; --blob2:#33296a; --blob3:#173f48; --blob4:#3e2a3c;
   }
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);
-  font:16px/1.65 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;}
-code,pre,kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
-a{color:var(--accent);text-decoration:none}
-a:hover{text-decoration:underline}
-.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;background:var(--bg);color:var(--ink);overflow-x:hidden;
+  font:17px/1.7 "Nunito",ui-rounded,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+code,pre,kbd{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+:not(pre)>code{font-size:.86em;background:var(--blue-soft);color:var(--ink);padding:.12em .42em;border-radius:6px}
+a{color:var(--accent);text-decoration:none;transition:color .15s}
+a:hover{color:var(--peri)}
+::selection{background:var(--peri-soft)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
 
 /* ---------- nav ---------- */
-header.nav{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);
-  backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--line)}
-.nav .wrap{display:flex;align-items:center;gap:18px;height:56px}
-.brand{font-weight:700;letter-spacing:-.02em;color:var(--ink);font-size:17px}
-.brand span{color:var(--muted);font-weight:500;font-size:13px;margin-left:8px}
-.nav nav{margin-left:auto;display:flex;gap:18px;flex-wrap:wrap}
-.nav nav a{color:var(--ink2);font-size:14px}
+header.nav{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 72%,transparent);
+  backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);
+  border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+.nav .wrap{display:flex;align-items:center;gap:18px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:-.02em;color:var(--ink);font-size:19px}
+.brand:hover{color:var(--ink)}
+.logo{width:30px;height:30px;border-radius:10px;background:var(--grad);display:grid;place-items:center;
+  box-shadow:0 6px 16px -4px rgba(91,141,239,.55)}
+.logo svg{width:18px;height:18px}
+.brand .ver{color:var(--peri);background:var(--peri-soft);font-weight:700;font-size:12px;padding:2px 9px;border-radius:999px}
+.nav nav{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+.nav nav a{color:var(--ink2);font-size:15px;font-weight:600;padding:6px 12px;border-radius:999px;transition:background .15s,color .15s}
+.nav nav a:hover{background:var(--blue-soft);color:var(--ink)}
 
 /* ---------- hero ---------- */
-.hero{padding:72px 0 40px;border-bottom:1px solid var(--line)}
-h1{font-size:clamp(34px,6vw,52px);line-height:1.05;letter-spacing:-.03em;margin:0 0 14px}
-.lede{font-size:clamp(17px,2.4vw,20px);color:var(--ink2);max-width:46rem;margin:0 0 10px}
-.lede strong{color:var(--ink);font-weight:600}
-.pills{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 26px}
-.pill{font-size:12.5px;color:var(--ink2);border:1px solid var(--line);background:var(--panel);
-  padding:3px 10px;border-radius:999px}
-.cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
-.btn{display:inline-block;padding:9px 16px;border-radius:8px;font-size:14.5px;font-weight:500;
-  border:1px solid var(--line);background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
-.btn:hover{text-decoration:none;border-color:var(--muted)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-.btn.primary:hover{filter:brightness(1.07)}
+.hero{position:relative;padding:96px 0 72px;overflow:hidden}
+.blobs{position:absolute;inset:0;z-index:-1;pointer-events:none}
+.blobs span{position:absolute;border-radius:50%;filter:blur(70px);opacity:.85;animation:float 18s ease-in-out infinite}
+.blobs span:nth-child(1){width:460px;height:460px;background:var(--blob1);top:-140px;left:-120px}
+.blobs span:nth-child(2){width:420px;height:420px;background:var(--blob2);top:-60px;right:-120px;animation-delay:-6s}
+.blobs span:nth-child(3){width:340px;height:340px;background:var(--blob3);bottom:-160px;left:30%;animation-delay:-11s}
+.blobs span:nth-child(4){width:260px;height:260px;background:var(--blob4);bottom:-60px;right:8%;animation-delay:-3s}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,25px) scale(.96)}}
+@media (prefers-reduced-motion:reduce){.blobs span{animation:none}html{scroll-behavior:auto}}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--ink2);
+  background:var(--panel);border:1px solid var(--line);padding:5px 14px 5px 6px;border-radius:999px;margin-bottom:24px;box-shadow:var(--shadow)}
+.eyebrow b{background:var(--grad);color:#fff;font-size:11.5px;padding:2px 9px;border-radius:999px;letter-spacing:.04em}
+h1{font-size:clamp(38px,7vw,66px);line-height:1.04;letter-spacing:-.035em;margin:0 0 22px;font-weight:900}
+h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{font-size:clamp(17px,2.4vw,20.5px);color:var(--ink2);max-width:44rem;margin:0 0 10px}
+.lede strong{color:var(--ink);font-weight:800}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin:26px 0 32px}
+.pill{font-size:13.5px;font-weight:700;padding:5px 13px;border-radius:999px}
+.pill:nth-child(5n+1){background:var(--blue-soft);color:var(--blue)}
+.pill:nth-child(5n+2){background:var(--mint-soft);color:var(--mint)}
+.pill:nth-child(5n+3){background:var(--peri-soft);color:var(--peri)}
+.pill:nth-child(5n+4){background:var(--peach-soft);color:var(--peach)}
+.pill:nth-child(5n+5){background:var(--sky-soft);color:var(--sky)}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:14px;font-size:15.5px;font-weight:800;
+  border:1px solid var(--line);background:var(--panel-solid);color:var(--ink);box-shadow:var(--shadow);
+  transition:transform .18s,box-shadow .18s,border-color .18s}
+.btn:hover{color:var(--ink);transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:color-mix(in srgb,var(--blue) 40%,var(--line))}
+.btn.primary{background:var(--grad);border-color:transparent;color:#fff;box-shadow:0 10px 26px -8px rgba(109,125,240,.7)}
+.btn.primary:hover{color:#fff;box-shadow:0 16px 34px -8px rgba(109,125,240,.8)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:56px}
+.stat{background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);
+  border-radius:18px;padding:16px 18px;box-shadow:var(--shadow)}
+.stat b{display:block;font-size:24px;font-weight:900;letter-spacing:-.02em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat span{font-size:13.5px;color:var(--muted);font-weight:600}
 
 /* ---------- sections ---------- */
-section{padding:52px 0;border-bottom:1px solid var(--line)}
-section:last-of-type{border-bottom:0}
-h2{font-size:clamp(22px,3.4vw,27px);letter-spacing:-.02em;margin:0 0 6px}
-h3{font-size:16px;margin:26px 0 8px;letter-spacing:-.01em}
-.sub{color:var(--muted);margin:0 0 24px;font-size:15px;max-width:44rem}
+section{padding:80px 0;position:relative}
+section.alt{background:linear-gradient(180deg,transparent,var(--bg2) 12%,var(--bg2) 88%,transparent)}
+.tag{display:inline-block;font-size:12.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--peri);margin-bottom:8px}
+h2{font-size:clamp(28px,4.4vw,38px);letter-spacing:-.03em;margin:0 0 10px;font-weight:900;line-height:1.15}
+h3{font-size:21px;margin:44px 0 10px;letter-spacing:-.015em;font-weight:800}
+.sub{color:var(--ink2);margin:0 0 30px;font-size:17.5px;max-width:42rem}
 p{max-width:44rem}
 
 /* ---------- code ---------- */
-.code{position:relative;background:var(--code-bg);border:1px solid var(--line);border-radius:10px;margin:14px 0}
-.code pre{margin:0;padding:15px 16px;overflow-x:auto;font-size:13.5px;line-height:1.6;color:var(--code-ink)}
-.code .cap{font-size:12px;color:var(--muted);padding:8px 14px 0}
-.copy{position:absolute;top:7px;right:7px;font-size:11.5px;color:var(--muted);background:var(--panel);
-  border:1px solid var(--line);border-radius:6px;padding:3px 8px;cursor:pointer;opacity:0;transition:opacity .15s}
-.code:hover .copy,.copy:focus{opacity:1}
-.cm{color:var(--muted)}
+.code{position:relative;background:var(--code-bg);border-radius:18px;margin:18px 0;box-shadow:var(--shadow-lg);overflow:hidden;
+  border:1px solid rgba(255,255,255,.06)}
+.code .bar{display:flex;align-items:center;gap:7px;padding:12px 80px 12px 16px;border-bottom:1px solid rgba(255,255,255,.07)}
+.code .bar i{width:11px;height:11px;border-radius:50%;background:#ff8f8f}
+.code .bar i:nth-child(2){background:#ffd27a}
+.code .bar i:nth-child(3){background:#86e1b0}
+.code .cap{font-size:13px;color:var(--code-cm);font-weight:600;margin-left:10px}
+.code pre{margin:0;padding:18px 20px 20px;overflow-x:auto;font-size:13.8px;line-height:1.75;color:var(--code-ink)}
+.copy{position:absolute;top:8px;right:10px;font:700 12px "Nunito",sans-serif;color:var(--code-ink);background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:4px 11px;cursor:pointer;transition:background .15s}
+.copy:hover{background:rgba(255,255,255,.16)}
+.cm{color:var(--code-cm);font-style:italic}
+.s{color:var(--code-str)} .kw{color:var(--code-kw)} .n{color:var(--code-num)} .fn{color:var(--code-fn)}
+.codes{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+.codes .code.wide{grid-column:1/-1}
 
 /* ---------- grid ---------- */
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:14px;margin-top:22px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:17px 18px;box-shadow:var(--shadow)}
-.card h4{margin:0 0 6px;font-size:15px;letter-spacing:-.01em}
-.card p{margin:0;font-size:14px;color:var(--ink2)}
-.card .k{display:block;font-size:12px;color:var(--accent2);font-weight:600;margin-bottom:8px;
-  text-transform:uppercase;letter-spacing:.07em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:10px}
+.card{background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);
+  border-radius:22px;padding:24px 24px 22px;box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s,border-color .2s}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:color-mix(in srgb,var(--c,var(--blue)) 45%,var(--line))}
+.card h4{margin:0 0 8px;font-size:18.5px;letter-spacing:-.015em;font-weight:800}
+.card p{margin:0;font-size:15.5px;color:var(--ink2)}
+.card .k{display:inline-block;font-size:12px;font-weight:800;margin-bottom:14px;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--c);background:var(--cs);padding:4px 11px;border-radius:999px}
+.card:nth-child(6n+1){--c:var(--blue);--cs:var(--blue-soft)}
+.card:nth-child(6n+2){--c:var(--peri);--cs:var(--peri-soft)}
+.card:nth-child(6n+3){--c:var(--mint);--cs:var(--mint-soft)}
+.card:nth-child(6n+4){--c:var(--peach);--cs:var(--peach-soft)}
+.card:nth-child(6n+5){--c:var(--pink);--cs:var(--pink-soft)}
+.card:nth-child(6n+6){--c:var(--sky);--cs:var(--sky-soft)}
 
 /* ---------- tables ---------- */
-.scroll{overflow-x:auto;margin-top:18px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
-table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px}
-th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line2);vertical-align:top}
-th{font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;
-  background:color-mix(in srgb,var(--panel) 70%,var(--bg))}
+.scroll{overflow-x:auto;margin-top:10px;border:1px solid var(--line);border-radius:20px;background:var(--panel);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;font-size:15px;min-width:560px}
+th,td{text-align:left;padding:13px 18px;border-bottom:1px solid var(--line2);vertical-align:top}
+th{font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800;background:color-mix(in srgb,var(--blue-soft) 45%,transparent)}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:color-mix(in srgb,var(--blue-soft) 35%,transparent)}
 tr:last-child td{border-bottom:0}
-td code{font-size:13px}
-.num{white-space:nowrap;color:var(--accent2);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+td strong{font-weight:800}
+.num{white-space:nowrap;color:var(--mint);font-family:"JetBrains Mono",ui-monospace,monospace;font-size:13.5px;font-weight:500}
+
+td.num::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--mint);margin-right:8px;vertical-align:middle;opacity:.8}
+p .num{background:var(--mint-soft);padding:1px 8px;border-radius:7px}
 
 /* ---------- callout ---------- */
-.note{border:1px solid var(--line);border-left:3px solid var(--warn);background:var(--panel);
-  border-radius:10px;padding:16px 18px;margin-top:20px;box-shadow:var(--shadow)}
-.note h4{margin:0 0 8px;font-size:15px}
-.note p{font-size:14.5px;color:var(--ink2);margin:0 0 8px}
+.note{border:1px solid color-mix(in srgb,var(--peach) 35%,var(--line));background:linear-gradient(135deg,var(--peach-soft),var(--pink-soft));
+  border-radius:22px;padding:24px 26px;margin-top:28px;box-shadow:var(--shadow)}
+.note h4{margin:0 0 10px;font-size:18px;font-weight:800;display:flex;align-items:center;gap:10px}
+.note h4::before{content:"!";display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--peach);color:#fff;font-size:15px;flex:none}
+.note p{font-size:15.5px;color:var(--ink2);margin:0 0 10px;max-width:none}
 .note p:last-child{margin-bottom:0}
+.note code{background:rgba(255,255,255,.5)}
 ul{padding-left:20px;max-width:44rem}
 li{margin:6px 0;color:var(--ink2);font-size:15px}
-footer{padding:34px 0 60px;color:var(--muted);font-size:14px}
-footer a{color:var(--ink2)}
+.unsupported{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.unsupported span{font-size:14.5px;font-weight:700;color:var(--ink2);border:1.5px dashed var(--line);padding:6px 14px;border-radius:999px}
+
+footer{padding:48px 0 64px;color:var(--muted);font-size:15px;border-top:1px solid var(--line)}
+footer .wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+footer p{margin:0}
+footer a{color:var(--ink2);font-weight:700}
+footer a:hover{color:var(--peri)}
+
+/* ---------- reveal ---------- */
+.js .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+.js .reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.js .reveal{opacity:1;transform:none;transition:none}}
+
+@media (max-width:820px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .codes{grid-template-columns:1fr}
+}
 @media (max-width:560px){
-  .hero{padding:44px 0 32px}
-  .nav nav{gap:12px}
+  .wrap{padding:0 16px}
+  .hero{padding:56px 0 48px}
+  section{padding:56px 0}
+  .nav nav{gap:0}
+  .nav nav a{padding:6px 8px;font-size:14px}
   .nav nav a.hide-s{display:none}
+  .brand .ver{display:none}
 }
 </style>
 </head>
@@ -108,11 +203,11 @@ footer a{color:var(--ink2)}
 
 <header class="nav">
   <div class="wrap">
-    <a class="brand" href="#top">ufoamp<span>v1.0.0</span></a>
+    <a class="brand" href="#top"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></span>ufoamp<span class="ver">v1.0.0</span></a>
     <nav>
       <a href="#start">Quick start</a>
-      <a href="#features">Features</a>
-      <a href="#validation">Validation</a>
+      <a class="hide-s" href="#features">Features</a>
+      <a class="hide-s" href="#validation">Validation</a>
       <a class="hide-s" href="ufoamp.pdf">Manual</a>
       <a href="https://github.com/spencer-ellis/ufoamp">GitHub</a>
     </nav>
@@ -120,8 +215,10 @@ footer a{color:var(--ink2)}
 </header>
 
 <div class="hero" id="top">
+  <div class="blobs" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
   <div class="wrap">
-    <h1>Matrix elements straight<br>from a UFO model.</h1>
+    <a class="eyebrow" href="https://github.com/spencer-ellis/ufoamp"><b>v1.0.0</b> Tree-level amplitudes, no code generation</a>
+    <h1>Matrix elements straight<br>from a <span class="g">UFO model.</span></h1>
     <p class="lede">ufoamp evaluates tree-level <strong>helicity amplitudes</strong> and <strong>|M|²</strong> by reading a UFO
       model directly, with coupling values chosen at <strong>run time</strong> — no code generation, no recompilation.
       Changing CV, C2V, C3, or switching from the SM UFO to HHVBF, is a function call.</p>
@@ -133,15 +230,22 @@ footer a{color:var(--ink2)}
       <span class="pill">SM · HHVBF · SMEFTsim 3 · MSSM</span>
     </div>
     <div class="cta">
-      <a class="btn primary" href="#start">Quick start</a>
+      <a class="btn primary" href="#start">Quick start →</a>
       <a class="btn" href="https://github.com/spencer-ellis/ufoamp">View on GitHub</a>
       <a class="btn" href="ufoamp.pdf">Manual (PDF)</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>0.1 ms</b><span>per 2 → 2 point, one core</span></div>
+      <div class="stat"><b>~1e-15</b><span>agreement with MadGraph</span></div>
+      <div class="stat"><b>9 / 9</b><span>SMEFTsim 3 variants</span></div>
+      <div class="stat"><b>~3 700</b><span>lines of Python, no build</span></div>
     </div>
   </div>
 </div>
 
 <section id="why">
-  <div class="wrap">
+  <div class="wrap reveal">
+    <span class="tag">Motivation</span>
     <h2>Why it exists</h2>
     <p class="sub">Built for the VBF di-Higgs and Goldstone-equivalence studies, where every question is
       “what happens to this amplitude when I change that coupling?”</p>
@@ -168,20 +272,22 @@ footer a{color:var(--ink2)}
   </div>
 </section>
 
-<section id="start">
-  <div class="wrap">
+<section id="start" class="alt">
+  <div class="wrap reveal">
+    <span class="tag">Get going</span>
     <h2>Quick start</h2>
     <p class="sub">Install, then point it at a UFO directory. <code>momenta</code> are NumPy 4-vectors
       <code>[E, px, py, pz]</code> with metric (+−−−), ordered initial + final.</p>
 
     <div class="code">
+      <div class="bar"><i></i><i></i><i></i><span class="cap">Install</span></div>
       <button class="copy">copy</button>
       <pre>pip install git+https://github.com/spencer-ellis/ufoamp.git
 <span class="cm"># or, from a clone:  pip install -e .        (optional extras: pip install "ufoamp[jax]")</span></pre>
     </div>
 
     <div class="code">
-      <div class="cap">|M|² for u d → u d H H at a chosen coupling point</div>
+      <div class="bar"><i></i><i></i><i></i><span class="cap">|M|² for u d → u d H H at a chosen coupling point</span></div>
       <button class="copy">copy</button>
       <pre>from ufoamp.analysis import MatrixElement
 
@@ -196,7 +302,7 @@ me.helicity_amplitudes(momenta)                 <span class="cm"># {(h1,...,hn):
     </div>
 
     <div class="code">
-      <div class="cap">Polarisations, LHE samples, and the validation ladder</div>
+      <div class="bar"><i></i><i></i><i></i><span class="cap">Polarisations, LHE samples, and the validation ladder</span></div>
       <button class="copy">copy</button>
       <pre>w = MatrixElement("HHVBF_UFO", "w+ w- &gt; h h", couplings={"CV": 1, "C2V": 1, "C3": 1})
 w.m2(momenta, pol={"w+": "L"})                  <span class="cm"># external helicity selection</span>
@@ -208,6 +314,7 @@ ev.m2_sample(read_lhe("events.lhe.gz"))         <span class="cm"># mixed-flavour
     </div>
 
     <div class="code">
+      <div class="bar"><i></i><i></i><i></i><span class="cap">Validate</span></div>
       <button class="copy">copy</button>
       <pre><span class="cm"># every line of the ladder must say PASS</span>
 export UFOAMP_MODELS=/path/to/models   <span class="cm"># SM_UFO/, HHVBF_UFO/, SMEFTsim/UFO_models/</span>
@@ -221,7 +328,8 @@ python3 -m ufoamp.validate --model /path/UFO --process "u d &gt; u d h h" \
 </section>
 
 <section id="features">
-  <div class="wrap">
+  <div class="wrap reveal">
+    <span class="tag">Capabilities</span>
     <h2>What it handles</h2>
     <p class="sub">Everything below is exercised by the test ladder in the repository.</p>
     <div class="grid">
@@ -275,8 +383,9 @@ python3 -m ufoamp.validate --model /path/UFO --process "u d &gt; u d h h" \
   </div>
 </section>
 
-<section id="validation">
-  <div class="wrap">
+<section id="validation" class="alt">
+  <div class="wrap reveal">
+    <span class="tag">Trust</span>
     <h2>Validation</h2>
     <p class="sub">The ladder runs from textbook cross sections to two-UFO, two-gauge comparisons. All exact unless
       stated.</p>
@@ -312,7 +421,8 @@ python3 -m ufoamp.validate --model /path/UFO --process "u d &gt; u d h h" \
 </section>
 
 <section id="inside">
-  <div class="wrap">
+  <div class="wrap reveal">
+    <span class="tag">Architecture</span>
     <h2>What is inside</h2>
     <p class="sub">About 3 700 lines of Python, no build step, no generated code.</p>
     <div class="scroll">
@@ -332,12 +442,13 @@ python3 -m ufoamp.validate --model /path/UFO --process "u d &gt; u d h h" \
       </table>
     </div>
     <h3>Not yet supported</h3>
-    <p>Spin-2 particles, colour sextets, and custom propagators or form factors.</p>
+    <div class="unsupported"><span>Spin-2 particles</span><span>Colour sextets</span><span>Custom propagators &amp; form factors</span></div>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
+    <a class="brand" href="#top"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></span>ufoamp</a>
     <p>ufoamp v1.0.0 · MIT licence · <a href="https://github.com/spencer-ellis/ufoamp">github.com/spencer-ellis/ufoamp</a>
       · <a href="ufoamp.pdf">manual</a></p>
   </div>
@@ -355,6 +466,36 @@ document.querySelectorAll(".code").forEach(function (block) {
     }, function () { btn.textContent = "ctrl+c"; });
   });
 });
+
+// light syntax colouring for the Python snippets (text nodes only; comments are pre-marked)
+var TOK=/("[^"]*"|'[^']*')|\b(from|import|export|python3|pip|install)\b|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_]\w*)(?=\()/g;
+document.querySelectorAll(".code pre").forEach(function (pre) {
+  Array.prototype.slice.call(pre.childNodes).forEach(function (node) {
+    if (node.nodeType !== 3) return;
+    var text = node.nodeValue, frag = document.createDocumentFragment(), last = 0, m;
+    TOK.lastIndex = 0;
+    while ((m = TOK.exec(text))) {
+      frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+      var span = document.createElement("span");
+      span.className = m[1] ? "s" : m[2] ? "kw" : m[3] ? "n" : "fn";
+      span.textContent = m[0];
+      frag.appendChild(span);
+      last = m.index + m[0].length;
+    }
+    frag.appendChild(document.createTextNode(text.slice(last)));
+    pre.replaceChild(frag, node);
+  });
+});
+
+// fade sections in as they scroll into view
+if ("IntersectionObserver" in window) {
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+  }, { rootMargin: "0px 0px -8% 0px" });
+  document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
+} else {
+  document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
+}
 </script>
 </body>
 </html>

@@ -34,6 +34,7 @@ from itertools import product
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
+import numpy as xp   # switchable backend (numpy | jax.numpy), see backend.py
 
 from .ufo_model import load, Model
 from .process import Process
@@ -211,7 +212,7 @@ class MatrixElement:
     def _to_frame(self, events):
         """Boost (N,n,4) or (n,4) momenta to self.pol_frame."""
         from .recursion import boost_matrix
-        M = np.asarray(events, dtype=float)
+        M = xp.asarray(events)                            # traceable under JAX
         fr = self.pol_frame
         if fr is None or fr == "lab":
             return M
@@ -223,7 +224,7 @@ class MatrixElement:
             legs = list(fr)
         P = M[:, legs].sum(axis=1)                       # (N,4)
         Lam = boost_matrix(P)                             # (N,4,4)
-        out = np.einsum("bij,bkj->bki", Lam, M)
+        out = xp.einsum("bij,bkj->bki", Lam, M)
         return out[0] if single else out
 
     # ------------------------------------------------------------- evaluation

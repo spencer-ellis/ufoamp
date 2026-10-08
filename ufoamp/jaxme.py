@@ -70,7 +70,7 @@ class JaxMatrixElement:
                     saved = amp.coup; amp.coup = coup
                 else:
                     saved = None
-                mom = me._to_frame(momenta) if me.pol_frame not in (None, "lab") else momenta
+                mom = me._to_frame(momenta)      # boost under tracing (pol_frame-aware)
                 v = proc.m2_batch(mom, configs)               # (N, C)
                 res = v.sum(axis=1) / n_avg
                 if saved is not None:
